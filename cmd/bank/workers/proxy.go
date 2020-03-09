@@ -6,11 +6,12 @@ import (
 	"github.com/stevenkitter/tools/wxHttp"
 )
 
-const ProxyGetURL = "http://localhost:8080/v2/ip"
+const ProxyGetURL = "http://35.220.159.74:5010/get/"
 
 type ProxyResponse struct {
-	Ip   string `json:"ip"`
-	Type string `json:"type"`
+	Proxy string `json:"proxy"`
+	Ip    string `json:"ip"`
+	Type  string `json:"type"`
 }
 
 // ProxyMan
@@ -38,7 +39,7 @@ func (p *ProxyMan) RequestAddressList() {
 	if err != nil {
 		panic(err)
 	}
-	if !pack.Contain(p.AddressList, result.Ip) {
-		p.AddressList = append(p.AddressList, result.Ip)
+	if !pack.Contain(p.AddressList, result.Proxy) {
+		p.AddressList = append(p.AddressList, "http://"+result.Proxy)
 	}
 }

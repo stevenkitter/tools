@@ -14,7 +14,7 @@ type BinCodeProducer struct {
 // wg 控制线程
 func (b *BinCodeProducer) GenerateBinCodeQueue(wg *sync.WaitGroup, queue chan<- uint64) {
 	for i := b.Start; i <= b.End; i++ {
-		queue <- i
 		wg.Add(1)
+		queue <- i
 	}
 }

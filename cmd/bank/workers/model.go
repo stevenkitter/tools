@@ -1,6 +1,10 @@
 package workers
 
-import "time"
+import (
+	"github.com/jinzhu/gorm"
+	"github.com/segmentio/ksuid"
+	"time"
+)
 
 type Bank struct {
 	ID        string     `gorm:"primary_key" sql:"comment:'主键'"`
@@ -12,4 +16,8 @@ type Bank struct {
 	Name     string `sql:"comment:'名称'"`
 	IconPath string `sql:"comment:'头像地址'"`
 	CardType string `sql:"comment:'储蓄卡'"`
+}
+
+func (b *Bank) BeforeCreate(scope *gorm.Scope) error {
+	return scope.SetColumn("id", ksuid.New().String())
 }

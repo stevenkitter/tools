@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-var workerCount = 20
+var workerCount = 5
 
 // Work 开启线程 工作
 func Work(queue <-chan uint64, group *sync.WaitGroup, m *ProxyMan) {
