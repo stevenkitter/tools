@@ -63,7 +63,7 @@ type Requester struct {
 }
 
 func init() {
-	DBWPath := "192.168.124.35:32306"
+	DBWPath := "35.220.159.74:3306"
 	DBPassword := os.Getenv("MYSQL_PWD")
 	d, err := JwesUtilsConn(DBWPath, DBPassword)
 	if err != nil {
@@ -71,10 +71,12 @@ func init() {
 	}
 	db = d
 	db.AutoMigrate(&Bank{})
+	db.AutoMigrate(&BankBin{})
+	db.AutoMigrate(&ErrorBankBin{})
 }
 
 func JwesUtilsConn(dbPath, password string) (*gorm.DB, error) {
-	return connectDB("jwes", password, dbPath, "jwes_utils")
+	return connectDB("tools", password, dbPath, "tools")
 }
 
 func connectDB(user, password, dbPath, database string) (*gorm.DB, error) {
@@ -84,6 +86,7 @@ func connectDB(user, password, dbPath, database string) (*gorm.DB, error) {
 
 // 请求银行信息
 func (r *Requester) RequestBankInfo(no uint64) {
+	log.Printf("now no is %d", no)
 	s := rand.Intn(2)
 	time.Sleep(time.Duration(s) * time.Second)
 	cli := wxHttp.Client{ProxyAddress: r.ProxyAddress}
@@ -97,6 +100,14 @@ func (r *Requester) RequestBankInfo(no uint64) {
 	d, err := cli.RequestFormUrlEncode(SnsPath, v, headers)
 	if err != nil {
 		log.Printf("请求外在银行卡信息接口出错 %v", err)
+		// 换新的代理ip
+		p := NewProxyMan()
+		pro := p.NewAddress()
+		r.ProxyAddress = pro
+		var binDest ErrorBankBin
+		db.Where(ErrorBankBin{
+			BinCode: fmt.Sprintf("%d", no),
+		}).Assign(BankBin{}).FirstOrCreate(&binDest)
 		return
 	}
 	var result SnsResponse
@@ -114,6 +125,9 @@ func (r *Requester) RequestBankInfo(no uint64) {
 		log.Printf("请求外在银行卡信息返回银行编号有误")
 		return
 	}
+
+	// 保存银行信息
+	// 保存bin对应银行code
 	var dest Bank
 	db.Where(Bank{
 		Code: codeArray[0],
@@ -122,4 +136,9 @@ func (r *Requester) RequestBankInfo(no uint64) {
 		IconPath: result.Response.CardInfo.IconURL,
 		CardType: result.Response.CardInfo.CardTypeName,
 	}).FirstOrCreate(&dest)
+
+	var binDest BankBin
+	db.Where(BankBin{
+		BinCode: fmt.Sprintf("%d", no),
+	}).Assign(BankBin{Code: codeArray[0]}).FirstOrCreate(&binDest)
 }

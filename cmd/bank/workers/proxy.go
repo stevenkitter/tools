@@ -2,11 +2,14 @@ package workers
 
 import (
 	"encoding/json"
-	"github.com/stevenkitter/tools/pack"
 	"github.com/stevenkitter/tools/wxHttp"
+	"log"
 )
 
-const ProxyGetURL = "http://35.220.159.74:5010/get/"
+const (
+	ProxyGetAllURL = "http://35.220.159.74:5010/get_all/"
+	ProxyGetURL    = "http://35.220.159.74:5010/get"
+)
 
 type ProxyResponse struct {
 	Proxy string `json:"proxy"`
@@ -30,6 +33,22 @@ func NewProxyMan() ProxyMan {
 
 func (p *ProxyMan) RequestAddressList() {
 	c := wxHttp.Client{}
+	rsp, err := c.RequestGet(ProxyGetAllURL, nil)
+	if err != nil {
+		panic(err)
+	}
+	var result []*ProxyResponse
+	err = json.Unmarshal(rsp, &result)
+	if err != nil {
+		panic(err)
+	}
+	for _, i := range result {
+		p.AddressList = append(p.AddressList, "http://"+i.Proxy)
+	}
+}
+
+func (p *ProxyMan) NewAddress() string {
+	c := wxHttp.Client{}
 	rsp, err := c.RequestGet(ProxyGetURL, nil)
 	if err != nil {
 		panic(err)
@@ -37,9 +56,8 @@ func (p *ProxyMan) RequestAddressList() {
 	var result ProxyResponse
 	err = json.Unmarshal(rsp, &result)
 	if err != nil {
-		panic(err)
+		log.Printf("获取新的ip代理出错 %v", err)
+		return ""
 	}
-	if !pack.Contain(p.AddressList, result.Proxy) {
-		p.AddressList = append(p.AddressList, "http://"+result.Proxy)
-	}
+	return "http://" + result.Proxy
 }
