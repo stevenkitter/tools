@@ -2,6 +2,7 @@ package wxHttp
 
 import (
 	"bytes"
+	"crypto/tls"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -57,7 +58,8 @@ func (c *Client) requestResource(request *http.Request, customHeaders map[string
 			return url.Parse(c.ProxyAddress)
 		}
 		httpClient.Transport = &http.Transport{
-			Proxy: proxy,
+			Proxy:           proxy,
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
 	}
 	for k, v := range customHeaders {

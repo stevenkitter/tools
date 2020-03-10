@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/jinzhu/gorm"
+	"github.com/stevenkitter/tools/database"
+	"github.com/stevenkitter/tools/models/tools"
 	"os"
 	"strings"
 
@@ -27,9 +29,9 @@ type SnsResponse struct {
 }
 
 type ResponseInfo struct {
-	Code     string   `json:"code"`
-	Msg      string   `json:"msg"`
-	CardInfo CardInfo `json:"card_info"`
+	Code     string    `json:"code"`
+	Msg      string    `json:"msg"`
+	CardInfo *CardInfo `json:"card_info"`
 }
 
 type CardInfo struct {
@@ -70,18 +72,13 @@ func init() {
 		panic(err)
 	}
 	db = d
-	db.AutoMigrate(&Bank{})
-	db.AutoMigrate(&BankBin{})
-	db.AutoMigrate(&ErrorBankBin{})
+	db.AutoMigrate(&tools.Bank{})
+	db.AutoMigrate(&tools.BankBin{})
+	db.AutoMigrate(&tools.ErrorBankBin{})
 }
 
 func JwesUtilsConn(dbPath, password string) (*gorm.DB, error) {
-	return connectDB("tools", password, dbPath, "tools")
-}
-
-func connectDB(user, password, dbPath, database string) (*gorm.DB, error) {
-	sqlUrl := fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=True&loc=Local", user, password, dbPath, database)
-	return gorm.Open("mysql", sqlUrl)
+	return database.ConnectMysqlDB("tools", password, dbPath, "tools")
 }
 
 // 请求银行信息
@@ -104,10 +101,10 @@ func (r *Requester) RequestBankInfo(no uint64) {
 		p := NewProxyMan()
 		pro := p.NewAddress()
 		r.ProxyAddress = pro
-		var binDest ErrorBankBin
-		db.Where(ErrorBankBin{
+		var binDest tools.ErrorBankBin
+		db.Where(tools.ErrorBankBin{
 			BinCode: fmt.Sprintf("%d", no),
-		}).Assign(BankBin{}).FirstOrCreate(&binDest)
+		}).Assign(tools.BankBin{}).FirstOrCreate(&binDest)
 		return
 	}
 	var result SnsResponse
@@ -116,7 +113,7 @@ func (r *Requester) RequestBankInfo(no uint64) {
 		log.Printf("请求外在银行卡信息接口解析对象出错 %v", err)
 		return
 	}
-	if result.Response.Code != "CD0000" {
+	if result.Response.Code != "CD0000" && result.Response.CardInfo == nil {
 		log.Printf("请求外在银行卡信息接口返回信息 %s", result.Response.Msg)
 		return
 	}
@@ -128,17 +125,19 @@ func (r *Requester) RequestBankInfo(no uint64) {
 
 	// 保存银行信息
 	// 保存bin对应银行code
-	var dest Bank
-	db.Where(Bank{
+	var dest tools.Bank
+	db.Where(tools.Bank{
 		Code: codeArray[0],
-	}).Assign(Bank{
+	}).Assign(tools.Bank{
 		Name:     result.Response.CardInfo.FrontBankCodeName,
 		IconPath: result.Response.CardInfo.IconURL,
-		CardType: result.Response.CardInfo.CardTypeName,
 	}).FirstOrCreate(&dest)
 
-	var binDest BankBin
-	db.Where(BankBin{
+	var binDest tools.BankBin
+	db.Where(tools.BankBin{
 		BinCode: fmt.Sprintf("%d", no),
-	}).Assign(BankBin{Code: codeArray[0]}).FirstOrCreate(&binDest)
+	}).Assign(tools.BankBin{
+		Code:     codeArray[0],
+		CardType: result.Response.CardInfo.CardTypeName,
+	}).FirstOrCreate(&binDest)
 }

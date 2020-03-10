@@ -1,5 +1,7 @@
 package pack
 
+import "strings"
+
 type String string
 
 // Equal
@@ -19,4 +21,13 @@ func Contain(list []string, item string) bool {
 		}
 	}
 	return false
+}
+
+func PrefixSection(dest string, num int) string {
+	arr := strings.Split(dest, "")
+	if len(arr) < num {
+		return ""
+	}
+	d := arr[:num]
+	return strings.Join(d, "")
 }
