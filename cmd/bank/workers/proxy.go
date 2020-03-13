@@ -2,8 +2,9 @@ package workers
 
 import (
 	"encoding/json"
-	"github.com/stevenkitter/tools/wxHttp"
 	"log"
+
+	"github.com/stevenkitter/tools/wxHttp"
 )
 
 const (
@@ -11,6 +12,7 @@ const (
 	ProxyGetURL    = "http://35.220.159.74:5010/get"
 )
 
+// ProxyResponse ip返回值
 type ProxyResponse struct {
 	Proxy string `json:"proxy"`
 	Ip    string `json:"ip"`

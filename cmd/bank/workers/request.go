@@ -3,11 +3,12 @@ package workers
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/jinzhu/gorm"
 	"github.com/stevenkitter/tools/database"
 	"github.com/stevenkitter/tools/models/tools"
-	"os"
-	"strings"
 
 	"github.com/stevenkitter/tools/wxHttp"
 
@@ -107,6 +108,7 @@ func (r *Requester) RequestBankInfo(no uint64) {
 		}).Assign(tools.BankBin{}).FirstOrCreate(&binDest)
 		return
 	}
+	db.Unscoped().Where("bin_code = ?", no).Delete(tools.ErrorBankBin{})
 	var result SnsResponse
 	err = json.Unmarshal(d, &result)
 	if err != nil {
@@ -140,4 +142,5 @@ func (r *Requester) RequestBankInfo(no uint64) {
 		Code:     codeArray[0],
 		CardType: result.Response.CardInfo.CardTypeName,
 	}).FirstOrCreate(&binDest)
+
 }
