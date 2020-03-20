@@ -5,6 +5,7 @@ import (
 	"sync"
 )
 
+// Run run
 func Run() {
 	p := NewProxyMan()
 

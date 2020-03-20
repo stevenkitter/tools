@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 )
-
-func Auth(nonce, timestamp, appId, appSecret, sign string) bool {
+// Auth a
+func Auth(nonce, timestamp, appID, appSecret, sign string) bool {
 	ss := strings.Split(nonce, "")
 	if len(ss) != 8 {
 		return false
@@ -29,7 +29,7 @@ func Auth(nonce, timestamp, appId, appSecret, sign string) bool {
 	if time.Now().Sub(d) > t {
 		return false
 	}
-	s := Signature(nonce, timestamp, appId, appSecret)
+	s := Signature(nonce, timestamp, appID, appSecret)
 	if s == sign {
 		return true
 	}
@@ -57,7 +57,7 @@ func RandomStr(length int) string {
 	}
 	return string(result)
 }
-
+// GetCurrTs n
 func GetCurrTs() int64 {
 	return time.Now().Unix()
 }

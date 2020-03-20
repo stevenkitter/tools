@@ -11,6 +11,7 @@ import (
 	"time"
 )
 
+// AesEncrypt a
 func AesEncrypt(orig string, key string) string {
 	// 转成字节数组
 	origData := []byte(orig)
@@ -33,6 +34,7 @@ func AesEncrypt(orig string, key string) string {
 
 }
 
+// AesDecrypt a
 func AesDecrypt(cryted string, key string) string {
 	// 转成字节数组
 	crytedByte, _ := base64.StdEncoding.DecodeString(cryted)
@@ -53,24 +55,27 @@ func AesDecrypt(cryted string, key string) string {
 	return string(orig)
 }
 
-//补码
+//PKCS7Padding 补码
 func PKCS7Padding(ciphertext []byte, blocksize int) []byte {
 	padding := blocksize - len(ciphertext)%blocksize
 	padtext := bytes.Repeat([]byte{byte(padding)}, padding)
 	return append(ciphertext, padtext...)
 }
 
-//去码
+//PKCS7UnPadding 去码
 func PKCS7UnPadding(origData []byte) []byte {
 	length := len(origData)
 	unpadding := int(origData[length-1])
 	return origData[:(length - unpadding)]
 }
 
-func EncryptUserId(userId, secret string) string {
-	token := AesEncrypt(userId+"="+fmt.Sprintf("%d", time.Now().UnixNano()), secret)
+// EncryptUserID e
+func EncryptUserID(userID, secret string) string {
+	token := AesEncrypt(userID+"="+fmt.Sprintf("%d", time.Now().UnixNano()), secret)
 	return token
 }
+
+// DecryptToken d
 func DecryptToken(token, secret string) string {
 	s := AesDecrypt(token, secret)
 	ts := strings.Split(s, "=")

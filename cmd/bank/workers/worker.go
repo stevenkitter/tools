@@ -14,9 +14,9 @@ func Work(queue <-chan uint64, group *sync.WaitGroup, m *ProxyMan) {
 		return
 	}
 	for i := 0; i < workerCount; i++ {
-		go func() {
-			DoSomething(queue, group, m.AddressList[i])
-		}()
+		go func(index int) {
+			DoSomething(queue, group, m.AddressList[index])
+		}(i)
 	}
 }
 

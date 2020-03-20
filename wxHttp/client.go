@@ -1,4 +1,4 @@
-package wxHttp
+package wxhttp
 
 import (
 	"bytes"
@@ -11,6 +11,7 @@ import (
 
 // 网络请求封装
 
+// Client client
 type Client struct {
 	ProxyAddress string
 }
@@ -18,7 +19,7 @@ type Client struct {
 // RequestJSON json 请求
 // path 资源路径
 // data json请求数据
-func (c *Client) RequestJSON(path string, data []byte, customHeaders map[string]string) (result []byte, err error) {
+func (c *Client) RequestJSON(path string, data []byte, customHeaders *map[string]string) (result []byte, err error) {
 	request, err := http.NewRequest("POST", path, bytes.NewReader(data))
 	if err != nil {
 		return
@@ -27,10 +28,10 @@ func (c *Client) RequestJSON(path string, data []byte, customHeaders map[string]
 	return c.requestResource(request, customHeaders)
 }
 
-// RequestFormUrlEncode form 请求 application/x-www-form-urlencoded
+// RequestFormURLEncode form 请求 application/x-www-form-urlencoded
 // path 资源路径
 // values 请求数据
-func (c *Client) RequestFormUrlEncode(path string, values url.Values, customHeaders map[string]string) (result []byte, err error) {
+func (c *Client) RequestFormURLEncode(path string, values url.Values, customHeaders *map[string]string) (result []byte, err error) {
 	request, err := http.NewRequest("POST", path, strings.NewReader(values.Encode()))
 	if err != nil {
 		return
@@ -39,8 +40,8 @@ func (c *Client) RequestFormUrlEncode(path string, values url.Values, customHead
 	return c.requestResource(request, customHeaders)
 }
 
-// RequestGet
-func (c *Client) RequestGet(path string, customHeaders map[string]string) (result []byte, err error) {
+// RequestGet get
+func (c *Client) RequestGet(path string, customHeaders *map[string]string) (result []byte, err error) {
 	request, err := http.NewRequest("GET", path, nil)
 	if err != nil {
 		return
@@ -51,7 +52,7 @@ func (c *Client) RequestGet(path string, customHeaders map[string]string) (resul
 // RequestResource 请求资源
 // request
 // customHeaders
-func (c *Client) requestResource(request *http.Request, customHeaders map[string]string) (result []byte, err error) {
+func (c *Client) requestResource(request *http.Request, customHeaders *map[string]string) (result []byte, err error) {
 	httpClient := http.Client{}
 	if c.ProxyAddress != "" {
 		proxy := func(_ *http.Request) (*url.URL, error) {
@@ -62,8 +63,10 @@ func (c *Client) requestResource(request *http.Request, customHeaders map[string
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
 	}
-	for k, v := range customHeaders {
-		request.Header.Set(k, v)
+	if customHeaders != nil {
+		for k, v := range *customHeaders {
+			request.Header.Set(k, v)
+		}
 	}
 	rsp, err := httpClient.Do(request)
 	if err != nil {

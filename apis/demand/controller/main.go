@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v7"
 	"github.com/jinzhu/gorm"
@@ -9,7 +10,7 @@ import (
 
 	"os"
 )
-
+// Controller api
 type Controller struct {
 	g     *gin.Engine
 	d     *gorm.DB
@@ -42,8 +43,8 @@ func NewController() *Controller {
 
 // Run start server
 func (ct *Controller) Run(addr string) error {
-	appId := "1Yv4vFyYK27tOdh1CTtL25ObC19"
-	key := fmt.Sprintf("app:secret:%s", appId)
+	appID := "1Yv4vFyYK27tOdh1CTtL25ObC19"
+	key := fmt.Sprintf("app:secret:%s", appID)
 	ct.cache.Set(key, "be010be1127d3547ec72d57561e61b8a81a03209", 0)
 	return ct.g.Run(addr)
 }

@@ -1,0 +1,30 @@
+{
+    "go.docsTool": "gogetdoc",
+    "go.formatTool": "goimports",
+    "go.inferGopath": false,
+    "go.useLanguageServer": true,
+    "go.autocompleteUnimportedPackages": true,
+    "go.gocodePackageLookupMode": "go",
+    "go.gotoSymbol.includeImports": true,
+    "go.useCodeSnippetsOnFunctionSuggest": true,
+    "go.useCodeSnippetsOnFunctionSuggestWithoutType": true,
+    "[go]": {
+        
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            
+            "source.organizeImports": true
+        }
+    },
+    "http.proxy": "http://127.0.0.1:8123",
+    "editor.fontSize": 13,
+    "protoc": {
+        "path": "/usr/local/bin/protoc",
+        "options": [
+            "--proto_path=${env.GOPATH}/src"
+        ]
+    },
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.fontFamily": "Fira Code",
+    "editor.fontLigatures": true
+}

@@ -2,16 +2,6 @@ package pack
 
 import "strings"
 
-type String string
-
-// Equal
-type Compare interface {
-	ExactId() string
-}
-
-func (s String) ExactId() string {
-	return string(s)
-}
 
 // Contain 包含
 func Contain(list []string, item string) bool {
@@ -22,7 +12,7 @@ func Contain(list []string, item string) bool {
 	}
 	return false
 }
-
+// PrefixSection 字符中截取前num段
 func PrefixSection(dest string, num int) string {
 	arr := strings.Split(dest, "")
 	if len(arr) < num {

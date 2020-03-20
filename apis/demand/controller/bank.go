@@ -2,9 +2,11 @@ package controller
 
 import (
 	"errors"
+
 	"github.com/stevenkitter/tools/pack"
 )
 
+// CardInfo info
 type CardInfo struct {
 	BankCode string `json:"bank_code"`
 	BankName string `json:"bank_name"`
@@ -29,7 +31,7 @@ func (ct *Controller) CardInfoBusiness(cardNo string) (result *CardInfo, err err
 	return
 }
 
-//
+// CardNoValidBusiness card
 func (ct *Controller) CardNoValidBusiness(cardNo string) bool {
 	return pack.LuHn(cardNo)
 }
