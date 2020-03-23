@@ -24,7 +24,7 @@
             "--proto_path=${env.GOPATH}/src"
         ]
     },
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.defaultFormatter": "ms-vscode.Go",
     "editor.fontFamily": "Fira Code",
     "editor.fontLigatures": true
 }
